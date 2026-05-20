@@ -1,0 +1,96 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  windows:
+    name: Windows x64
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.9.2"
+          arch: "win64_mingw"
+          tools: "tools_mingw1310"
+
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Deploy Qt runtime
+        shell: pwsh
+        run: |
+          windeployqt --release --compiler-runtime build\ClaudeUsageMonitor.exe
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $paths = @(
+            "build\ClaudeUsageMonitor.exe",
+            "build\*.dll",
+            "build\platforms",
+            "build\styles",
+            "build\imageformats",
+            "build\iconengines"
+          ) | Where-Object { Test-Path $_ }
+          Compress-Archive -Path $paths -DestinationPath ClaudeUsageMonitor-windows-x64.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ClaudeUsageMonitor-windows-x64
+          path: ClaudeUsageMonitor-windows-x64.zip
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ClaudeUsageMonitor-windows-x64.zip
+
+  linux:
+    name: Linux x64
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake ninja-build qt6-base-dev libcurl4-openssl-dev
+
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Package
+        run: |
+          mkdir -p package
+          cp build/ClaudeUsageMonitor package/
+          tar -C package -czf ClaudeUsageMonitor-linux-x64.tar.gz .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ClaudeUsageMonitor-linux-x64
+          path: ClaudeUsageMonitor-linux-x64.tar.gz
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ClaudeUsageMonitor-linux-x64.tar.gz
