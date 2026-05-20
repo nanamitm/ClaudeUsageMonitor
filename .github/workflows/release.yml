@@ -99,7 +99,7 @@ jobs:
             --icon-file AppDir/usr/share/icons/hicolor/scalable/apps/ClaudeUsageMonitor.svg \
             --plugin qt \
             --output appimage
-          mv ./*-x86_64.AppImage ClaudeUsageMonitor-linux-x64.AppImage
+          mv Claude_Usage_Monitor-x86_64.AppImage ClaudeUsageMonitor-linux-x64.AppImage
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
