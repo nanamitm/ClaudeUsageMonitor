@@ -38,3 +38,8 @@ sudo apt install qt6-base-dev libcurl4-openssl-dev cmake build-essential
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
+
+Tagged GitHub Actions releases publish:
+
+- `ClaudeUsageMonitor-windows-x64.zip`
+- `ClaudeUsageMonitor-linux-x64.AppImage`

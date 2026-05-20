@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Claude Usage Monitor
+Comment=Floating Claude Code usage monitor
+Exec=ClaudeUsageMonitor
+Icon=ClaudeUsageMonitor
+Categories=Utility;
+Terminal=false
